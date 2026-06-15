@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VibeNYC — AI Demo Day</title>
+  <meta name="description" content="A low-pressure, high-signal evening for AI builders in NYC. Show your hacks, ship your MVPs, stay for the vibe." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0b;
+      --surface: rgba(255, 255, 255, 0.04);
+      --border: rgba(255, 255, 255, 0.08);
+      --text: #f4f2ef;
+      --muted: rgba(244, 242, 239, 0.55);
+      --accent: #e8c47c;
+      --accent-dim: rgba(232, 196, 124, 0.15);
+      --glow: rgba(232, 196, 124, 0.06);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Geist', system-ui, -apple-system, sans-serif;
+      font-weight: 300;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ambient background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -10%, var(--glow), transparent),
+        radial-gradient(ellipse 60% 40% at 90% 80%, rgba(120, 100, 200, 0.04), transparent);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .grain {
+      position: fixed;
+      inset: 0;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* nav */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 80px;
+    }
+
+    .logo {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-cta {
+      font-size: 0.8rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--accent);
+      text-decoration: none;
+      padding: 8px 18px;
+      border: 1px solid rgba(232, 196, 124, 0.35);
+      border-radius: 100px;
+      transition: background 0.25s, border-color 0.25s;
+    }
+
+    .nav-cta:hover {
+      background: var(--accent-dim);
+      border-color: var(--accent);
+    }
+
+    /* hero */
+    .hero { margin-bottom: 100px; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .eyebrow::before {
+      content: '';
+      width: 24px;
+      height: 1px;
+      background: var(--accent);
+      opacity: 0.6;
+    }
+
+    h1 {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: clamp(3.2rem, 10vw, 5.5rem);
+      font-weight: 400;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      margin-bottom: 32px;
+    }
+
+    h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      font-size: 1.125rem;
+      color: var(--muted);
+      max-width: 480px;
+      margin-bottom: 48px;
+      line-height: 1.7;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+      padding: 28px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 40px;
+    }
+
+    .meta-item label {
+      display: block;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .meta-item span {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--text);
+    }
+
+    .spots {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .spots .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #6fcf97;
+      box-shadow: 0 0 8px rgba(111, 207, 151, 0.5);
+      animation: pulse 2.5s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--accent);
+      color: #0a0a0b;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      padding: 14px 28px;
+      border-radius: 100px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 32px rgba(232, 196, 124, 0.25);
+    }
+
+    .btn-primary svg { transition: transform 0.2s; }
+    .btn-primary:hover svg { transform: translateX(3px); }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.875rem;
+      text-decoration: none;
+      margin-left: 24px;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .btn-secondary:hover {
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    /* sections */
+    section { margin-bottom: 88px; }
+
+    .section-label {
+      font-size: 0.7rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+      opacity: 0.8;
+    }
+
+    h2 {
+      font-family: 'Instrument Serif', Georgia, serif;
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+      line-height: 1.15;
+    }
+
+    .prose {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.75;
+    }
+
+    .prose p + p { margin-top: 16px; }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 24px;
+    }
+
+    .tag {
+      font-size: 0.78rem;
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--muted);
+      background: var(--surface);
+    }
+
+    /* agenda */
+    .timeline { margin-top: 32px; }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 100px 1fr;
+      gap: 24px;
+      padding: 24px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .timeline-item:first-child { border-top: 1px solid var(--border); }
+
+    .time {
+      font-size: 0.8rem;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      padding-top: 2px;
+    }
+
+    .timeline-body h3 {
+      font-size: 1rem;
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+
+    .timeline-body p {
+      font-size: 0.875rem;
+      color: var(--muted);
+    }
+
+    /* speakers */
+    .speaker-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-top: 32px;
+    }
+
+    .speaker {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: start;
+      padding: 24px;
+      background: var(--bg);
+      transition: background 0.2s;
+    }
+
+    .speaker:hover { background: rgba(255,255,255,0.02); }
+
+    .speaker-name {
+      font-size: 1rem;
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+
+    .speaker-role {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .speaker-role a {
+      color: var(--text);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(232, 196, 124, 0.35);
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    .speaker-role a:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .speaker-badge {
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid rgba(232, 196, 124, 0.3);
+      padding: 4px 10px;
+      border-radius: 100px;
+      white-space: nowrap;
+      align-self: start;
+    }
+
+    /* cta block */
+    .cta-block {
+      text-align: center;
+      padding: 64px 32px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+      margin-bottom: 80px;
+    }
+
+    .cta-block h2 { margin-bottom: 12px; }
+
+    .cta-block p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 32px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+      font-size: 0.875rem;
+      text-decoration: none;
+      padding: 13px 24px;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .btn-outline:hover {
+      border-color: rgba(255,255,255,0.2);
+      background: var(--surface);
+    }
+
+    /* footer */
+    footer {
+      padding: 32px 0 48px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    footer p {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    footer a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: color 0.2s;
+    }
+
+    footer a:hover { color: var(--text); }
+
+    /* fade-in */
+    .fade {
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .fade.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (max-width: 520px) {
+      nav { margin-bottom: 56px; }
+      .hero { margin-bottom: 72px; }
+      .meta-row { gap: 20px; }
+      .timeline-item { grid-template-columns: 1fr; gap: 8px; }
+      .btn-secondary { margin-left: 0; margin-top: 16px; display: flex; }
+      .speaker { grid-template-columns: 1fr; }
+      .cta-block { padding: 48px 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grain"></div>
+
+  <div class="wrap">
+    <nav>
+      <a href="#" class="logo">VibeNYC</a>
+      <a href="https://partiful.com/e/VlbUsmtyNpeYUj0VwdBI?c=kfTxOIZf" class="nav-cta" target="_blank" rel="noopener">RSVP</a>
+    </nav>
+
+    <header class="hero fade">
+      <div class="eyebrow">AI Demo Day · NYC</div>
+      <h1>Come for the code,<br>stay for the <em>vibe</em>.</h1>
+      <p class="hero-sub">
+        A low-pressure, high-signal evening for builders who are actively making things with AI — not pitching polished decks.
+      </p>
+
+      <div class="meta-row">
+        <div class="meta-item">
+          <label>Date</label>
+          <span>Sat, June 27</span>
+        </div>
+        <div class="meta-item">
+          <label>Time</label>
+          <span>6:00 – 9:00 PM ET</span>
+        </div>
+        <div class="meta-item">
+          <label>Location</label>
+          <span>Manhattan, NYC</span>
+        </div>
+      </div>
+
+      <div class="spots" style="margin-bottom: 28px;">
+        <span class="dot"></span>
+        Limited spots — RSVP by June 21
+      </div>
+
+      <div>
+        <a href="https://partiful.com/e/VlbUsmtyNpeYUj0VwdBI?c=kfTxOIZf" class="btn-primary" target="_blank" rel="noopener">
+          Reserve your spot
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="https://tally.so/r/gDOL4d" class="btn-secondary" target="_blank" rel="noopener">Apply to demo →</a>
+      </div>
+    </header>
+
+    <section class="fade">
+      <div class="section-label">About</div>
+      <h2>Real builds, real conversations.</h2>
+      <div class="prose">
+        <p>
+          This is not a corporate pitch competition. This is not a marketing-heavy product showcase. We want to see the problem you've been hacking on — the weird late-night ideas, the agentic workflows, and the MVPs that <em>almost</em> work.
+        </p>
+        <p>
+          The best conversations happen when people show up with something real. Pizza and drinks on us.
+        </p>
+      </div>
+      <div class="tag-list">
+        <span class="tag">Founders</span>
+        <span class="tag">AI Engineers</span>
+        <span class="tag">Product Managers</span>
+        <span class="tag">Investors</span>
+        <span class="tag">Mandarin-speaking</span>
+      </div>
+    </section>
+
+    <section class="fade">
+      <div class="section-label">Agenda</div>
+      <h2>Three hours, zero fluff.</h2>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="time">6:00 PM</div>
+          <div class="timeline-body">
+            <h3>Doors open</h3>
+            <p>Grab a drink, find your people.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time">6:30 PM</div>
+          <div class="timeline-body">
+            <h3>Featured speakers</h3>
+            <p>Five builders share what they've been shipping — raw demos welcome.</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="time">8:30 PM</div>
+          <div class="timeline-body">
+            <h3>Deep vibe networking</h3>
+            <p>The part where the real connections happen.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="fade">
+      <div class="section-label">Featured</div>
+      <h2>Who's taking the stage.</h2>
+      <div class="speaker-grid">
+        <div class="speaker">
+          <div>
+            <div class="speaker-name">Henry Shen</div>
+            <div class="speaker-role">Founder, CraneLabs — AI Data Management & Infrastructure</div>
+          </div>
+          <span class="speaker-badge">Pre-Seed – Series A</span>
+        </div>
+        <div class="speaker">
+          <div>
+            <div class="speaker-name">Han Su</div>
+            <div class="speaker-role">Founder, <a href="https://privoce.com" target="_blank" rel="noopener">VoceSpace AI</a> — Defining the next social media in the AI era</div>
+          </div>
+          <span class="speaker-badge">Pre-Seed – Series A</span>
+        </div>
+        <div class="speaker">
+          <div>
+            <div class="speaker-name">Onlu</div>
+            <div class="speaker-role">Finance Job Search & Interview Prep AI — Investment Professional</div>
+          </div>
+          <span class="speaker-badge">Demo</span>
+        </div>
+        <div class="speaker">
+          <div>
+            <div class="speaker-name">You?</div>
+            <div class="speaker-role">Building something agentic? Apply below — any idea welcome.</div>
+          </div>
+          <span class="speaker-badge">Open slot</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="cta-block fade">
+      <h2>Building something?</h2>
+      <p>We're looking for founders and builders with agentic workflows, AI tools, or data-layer experiments to demo live.</p>
+      <div class="cta-actions">
+        <a href="https://tally.so/r/gDOL4d" class="btn-primary" target="_blank" rel="noopener">
+          Apply to present
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="https://partiful.com/e/VlbUsmtyNpeYUj0VwdBI?c=kfTxOIZf" class="btn-outline" target="_blank" rel="noopener">RSVP on Partiful</a>
+      </div>
+    </div>
+
+    <footer>
+      <p>© 2026 VibeNYC</p>
+      <a href="https://partiful.com/e/VlbUsmtyNpeYUj0VwdBI?c=kfTxOIZf" target="_blank" rel="noopener">partiful.com ↗</a>
+    </footer>
+  </div>
+
+  <script>
+    const fades = document.querySelectorAll('.fade');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.12 });
+    fades.forEach(el => observer.observe(el));
+    fades[0]?.classList.add('visible');
+  </script>
+</body>
+</html>
